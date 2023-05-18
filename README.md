@@ -1,7 +1,5 @@
 # lana
 
-  git config --global user.email "you@example.com"
-  git config --global user.name "Your Name"
-  
-  hi
+  git config --global user.email "jwan7613@uni.sydney.edu.au"
+  git config --global user.name "Slayerlana"
   
