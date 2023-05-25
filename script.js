@@ -13,11 +13,21 @@ class Particle {
     this.speedY = speedY;
     this.originalSpeedX = speedX;
     this.originalSpeedY = speedY;
+    this.angle = Math.random() * (2 * Math.PI);
   }
 
   update() {
-    this.x += this.speedX;
-    this.y += this.speedY;
+    const cx = canvas.width / 2; 
+    const cy = canvas.height / 2; 
+    const rx = 450; 
+    const ry = 150; 
+    const speed = 0.0006; 
+
+    this.x = cx + rx * Math.cos(this.angle);
+    this.y = cy + ry * Math.sin(this.angle * 2);
+
+    this.angle += speed;
+    this.angle = this.angle % (2 * Math.PI);
 
     if (this.x <= 0 || this.x >= canvas.width) {
       this.speedX *= -1; // Reverse horizontal direction
@@ -114,5 +124,3 @@ canvas.addEventListener('mouseout', function () {
 
 createParticles();
 animate();
-
-
