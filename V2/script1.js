@@ -69,8 +69,9 @@ class Particle {
     this.y = cy + ry * Math.sin(this.angle * 2);
     this.speedX = Math.random() * 2 - 1; // Customize the range of speedX according to your needs
     this.speedY = Math.random() * 2 - 1; // Customize the range of speedY according to your needs
-    this.fadeOutTime = Math.random() * 5000 + 2000; // Customize the range of fadeOutTime according to your needs
+    this.fadeOutTime = Math.random() * 5000 + 5000; // Customize the range of fadeOutTime according to your needs
     this.alpha = 1;
+    this.size += 5; // Increase the size by 1 each time the particle is reset
     this.color = this.calculateColor();
     this.isHovered = false;
   }
