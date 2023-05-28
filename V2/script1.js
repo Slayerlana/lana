@@ -4,129 +4,173 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 class Particle {
-  constructor(x, y, size, speedX, speedY) {
+  constructor(x, y, size, color, speedX, speedY) {
     this.x = x;
     this.y = y;
     this.size = size;
+    this.color = color;
     this.speedX = speedX;
     this.speedY = speedY;
-    this.fadeOutTime = Math.random() * 5000 + 6000; // Random fade out time between 2-7 seconds
-    this.alpha = 1;
-    this.color = this.calculateColor();
+    this.originalSpeedX = speedX;
+    this.originalSpeedY = speedY;
     this.angle = Math.random() * (2 * Math.PI);
-    this.isHovered = false;
-  }
-
-  calculateColor() {
-    const minSpeed = 0.1; // Minimum speed value for determining color
-    const maxSpeed = 2; // Maximum speed value for determining color
-    const normalizedSpeed = (Math.sqrt(this.speedX ** 2 + this.speedY ** 2) - minSpeed) / (maxSpeed - minSpeed);
-    const hue = (1 - normalizedSpeed) * 120; // Ranges from 0 (green) to 120 (red)
-    return `hsl(${hue}, 100%, 50%)`;
   }
 
   update() {
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const rx = 450;
-    const ry = 150;
-    const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001; // Adjust the multiplication factor to control the speed
-
-    this.angle += speed;
-    this.angle = this.angle % (2 * Math.PI);
+    const cx = canvas.width / 2; 
+    const cy = canvas.height / 2; 
+    const rx = 450; 
+    const ry = 150; 
+    const speed = 0.0006; 
 
     this.x = cx + rx * Math.cos(this.angle);
     this.y = cy + ry * Math.sin(this.angle * 2);
 
-    if (this.isHovered) {
-      this.color = 'red';
-    } else {
-      this.alpha -= 1 / (this.fadeOutTime / 3); // Adjust the division factor to control the fading speed
-
-      if (this.alpha <= 0) {
-        this.alpha = 0;
-        this.reset();
-      }
-    }
+    this.angle += speed;
+    this.angle = this.angle % (2 * Math.PI);
   }
 
   draw() {
-    ctx.globalAlpha = this.alpha;
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fillStyle = this.color;
     ctx.fill();
-    ctx.globalAlpha = 1;
   }
 
-  reset() {
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const rx = 450;
-    const ry = 150;
+  setDirection(x, y) {
+    const speed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+    const angle = Math.atan2(y - this.y, x - this.x);
 
-    this.x = cx + rx * Math.cos(this.angle);
-    this.y = cy + ry * Math.sin(this.angle * 2);
-    this.speedX = Math.random() * 2 - 1; // Customize the range of speedX according to your needs
-    this.speedY = Math.random() * 2 - 1; // Customize the range of speedY according to your needs
-    this.fadeOutTime = Math.random() * 5000 + 5000; // Customize the range of fadeOutTime according to your needs
-    this.alpha = 1;
-    this.size += 5; // Increase the size by 1 each time the particle is reset
-    this.color = this.calculateColor();
-    this.isHovered = false;
+    this.speedX = Math.cos(angle) * speed;
+    this.speedY = Math.sin(angle) * speed;
+  }
+
+  resetDirection() {
+    this.speedX = this.originalSpeedX;
+    this.speedY = this.originalSpeedY;
+  }
+
+  enlargeSize(targetSize, duration) {
+    const initialSize = this.size;
+    const sizeIncrement = (targetSize - initialSize) / (duration * 60); // Assuming 60 frames per second
+
+    let currentSize = initialSize;
+    let elapsedTime = 0;
+
+    return new Promise((resolve) => {
+      const sizeAnimation = setInterval(() => {
+        currentSize += sizeIncrement;
+        this.size = currentSize;
+        elapsedTime += 1000 / 60; // Assuming 60 frames per second
+
+        if (elapsedTime >= duration * 1000) {
+          clearInterval(sizeAnimation);
+          resolve();
+        }
+      }, 1000 / 60); // Assuming 60 frames per second
+    });
   }
 }
 
 let particles = [];
+let redParticles = [];
+const particleLimit = 300;
+const redParticleLimit = 10;
+const sizeAnimationDuration = 5; // In seconds
+let isEnlarging = false;
 
 function createParticles() {
-  const particleCount = 150;
+  const particleCount = 100;
   const size = 10;
 
   for (let i = 0; i < particleCount; i++) {
-    const angle = Math.random() * (2 * Math.PI);
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const rx = 450;
-    const ry = 150;
-    const x = cx + rx * Math.cos(angle);
-    const y = cy + ry * Math.sin(angle * 2);
-    const speedX = Math.random() * 2 - 1; // Customize the range of speedX according to your needs
-    const speedY = Math.random() * 2 - 1; // Customize the range of speedY according to your needs
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const speedX = Math.random() * 2 - 1;
+    const speedY = Math.random() * 2 - 1;
+    const hue = Math.floor(Math.random() * 60 + 40); // Random hue in the range 40-100
+    const saturation = Math.floor(Math.random() * 50 + 50); // Random saturation in the range 50-100
+    const lightness = Math.floor(Math.random() * 10 + 70); // Random lightness in the range 70-80
+    const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 
-    particles.push(new Particle(x, y, size, speedX, speedY));
+    particles.push(new Particle(x, y, size, color, speedX, speedY));
   }
+}
+
+function createRedParticle(x, y) {
+  const size = 10;
+  const color = 'red';
+  const speedX = Math.random() * 2 - 1;
+  const speedY = Math.random() * 2 - 1;
+
+  redParticles.push(new Particle(x, y, size, color, speedX, speedY));
+
+  if (redParticles.length === redParticleLimit) {
+    if (!isEnlarging) {
+      isEnlarging = true;
+      enlargeParticlesSize();
+    } else {
+      restartParticles();
+    }
+  }
+}
+
+function checkCollision(particle) {
+  for (let i = 0; i < redParticles.length; i++) {
+    const redParticle = redParticles[i];
+    const dx = particle.x - redParticle.x;
+    const dy = particle.y - redParticle.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    if (distance <= particle.size + redParticle.size) {
+      redParticle.color = 'red';
+    }
+  }
+}
+
+async function enlargeParticlesSize() {
+  const allParticles = [...particles, ...redParticles];
+  await Promise.all(allParticles.map(particle => particle.enlargeSize(50, sizeAnimationDuration)));
+
+  restartParticles();
+}
+
+function restartParticles() {
+  particles = [];
+  redParticles = [];
+  isEnlarging = false;
+  createParticles();
 }
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   for (let i = 0; i < particles.length; i++) {
-    particles[i].update();
-    particles[i].draw();
+    const particle = particles[i];
+    particle.update();
+    particle.draw();
+    checkCollision(particle);
+  }
+
+  for (let i = 0; i < redParticles.length; i++) {
+    const redParticle = redParticles[i];
+    redParticle.update();
+    redParticle.draw();
+  }
+
+  if (particles.length < particleLimit) {
+    createParticles();
   }
 
   requestAnimationFrame(animate);
 }
 
-function handleMouseMove(event) {
-  const rect = canvas.getBoundingClientRect();
-  const mouseX = event.clientX - rect.left;
-  const mouseY = event.clientY - rect.top;
+canvas.addEventListener('click', (event) => {
+  const x = event.clientX;
+  const y = event.clientY;
 
-  for (let i = 0; i < particles.length; i++) {
-    const particle = particles[i];
-    const distance = Math.sqrt((mouseX - particle.x) ** 2 + (mouseY - particle.y) ** 2);
-
-    if (distance <= particle.size) {
-      particle.isHovered = true;
-    } else {
-      particle.isHovered = false;
-    }
-  }
-}
+  createRedParticle(x, y);
+});
 
 createParticles();
 animate();
-
-canvas.addEventListener('mousemove', handleMouseMove);
