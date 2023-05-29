@@ -4,7 +4,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 class Particle {
-  constructor(x, y, size, color, speedX, speedY) {
+  constructor(x, y, size, color, speedX, speedY, hue, saturation) {
     this.x = x;
     this.y = y;
     this.size = size;
@@ -14,6 +14,8 @@ class Particle {
     this.originalSpeedX = speedX;
     this.originalSpeedY = speedY;
     this.angle = Math.random() * (2 * Math.PI);
+    this.hue = hue;
+    this.saturation = saturation;
   }
 
   update() {
@@ -21,7 +23,7 @@ class Particle {
     const cy = canvas.height / 2; 
     const rx = 450; 
     const ry = 150; 
-    const speed = 0.0006; 
+    const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
 
     this.x = cx + rx * Math.cos(this.angle);
     this.y = cy + ry * Math.sin(this.angle * 2);
@@ -37,37 +39,29 @@ class Particle {
     ctx.fill();
   }
 
-  setDirection(x, y) {
-    const speed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
-    const angle = Math.atan2(y - this.y, x - this.x);
-
-    this.speedX = Math.cos(angle) * speed;
-    this.speedY = Math.sin(angle) * speed;
-  }
-
-  resetDirection() {
-    this.speedX = this.originalSpeedX;
-    this.speedY = this.originalSpeedY;
-  }
-
   enlargeSize(targetSize, duration) {
     const initialSize = this.size;
-    const sizeIncrement = (targetSize - initialSize) / (duration * 60); // Assuming 60 frames per second
+    const sizeIncrement = (targetSize - initialSize) / (duration * 60); 
+    const initialLightness = parseInt(this.color.slice(-3, -1));
+    const lightnessDecrement = initialLightness / (duration * 60); 
 
     let currentSize = initialSize;
+    let currentLightness = initialLightness;
     let elapsedTime = 0;
 
     return new Promise((resolve) => {
       const sizeAnimation = setInterval(() => {
         currentSize += sizeIncrement;
+        currentLightness -= lightnessDecrement;
         this.size = currentSize;
-        elapsedTime += 1000 / 60; // Assuming 60 frames per second
+        this.color = this.color.replace(/(\d{1,3})%/, `${currentLightness}%`);
+        elapsedTime += 1000 / 60; 
 
         if (elapsedTime >= duration * 1000) {
           clearInterval(sizeAnimation);
           resolve();
         }
-      }, 1000 / 60); // Assuming 60 frames per second
+      }, 1000 / 60); 
     });
   }
 }
@@ -76,30 +70,42 @@ let particles = [];
 let redParticles = [];
 const particleLimit = 300;
 const redParticleLimit = 10;
-const sizeAnimationDuration = 5; // In seconds
+const sizeAnimationDuration = 3; 
 let isEnlarging = false;
 
 function createParticles() {
   const particleCount = 100;
   const size = 10;
 
+  const speeds = [];
+  for (let i = 0; i < particleCount; i++) {
+    const speed = Math.random() * 2 + 0.01; 
+    speeds.push(speed);
+  }
+
+  const minSpeed = Math.min(...speeds);
+  const maxSpeed = Math.max(...speeds);
+
   for (let i = 0; i < particleCount; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const speedX = Math.random() * 2 - 1;
-    const speedY = Math.random() * 2 - 1;
-    const hue = Math.floor(Math.random() * 60 + 40); // Random hue in the range 40-100
-    const saturation = Math.floor(Math.random() * 50 + 50); // Random saturation in the range 50-100
-    const lightness = Math.floor(Math.random() * 10 + 70); // Random lightness in the range 70-80
+    const speedX = speeds[i] * (2 * (speeds[i] === minSpeed) - 1); 
+    const speedY = speeds[i] * (2 * (speeds[i] === minSpeed) - 1);
+    const hue = 240 - Math.floor(120 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed)); 
+    const saturation = 100; 
+    const lightness = Math.floor(50 - 20 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed)); 
+
     const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
 
     particles.push(new Particle(x, y, size, color, speedX, speedY));
   }
 }
 
+
+
 function createRedParticle(x, y) {
   const size = 10;
-  const color = 'red';
+  const color = 'rgb(139,0,0)';
   const speedX = Math.random() * 2 - 1;
   const speedY = Math.random() * 2 - 1;
 
@@ -123,14 +129,14 @@ function checkCollision(particle) {
     const distance = Math.sqrt(dx * dx + dy * dy);
 
     if (distance <= particle.size + redParticle.size) {
-      redParticle.color = 'red';
+      redParticle.color = 'rgb(139,0,0)';
     }
   }
 }
 
 async function enlargeParticlesSize() {
   const allParticles = [...particles, ...redParticles];
-  await Promise.all(allParticles.map(particle => particle.enlargeSize(50, sizeAnimationDuration)));
+  await Promise.all(allParticles.map(particle => particle.enlargeSize(700, sizeAnimationDuration)));
 
   restartParticles();
 }
