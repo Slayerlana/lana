@@ -20,6 +20,7 @@ class Particle {
     this.targetColor = color;
     this.colorTimer = 0; 
     this.lifeTime = 0;
+    this.status = 'stable';
   }
 
 update() {
@@ -37,6 +38,40 @@ update() {
 
     this.angle += speed;
     this.angle = this.angle % (2 * Math.PI);
+
+
+    if (redParticles.length >= redParticleLimit && this.status === 'stable') {
+      this.moveInCircle();
+      this.status = 'unstable';
+    } else if (this.status === 'unstable' && redParticles.length < 5) {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const rx = 450;
+      const ry = 150;
+      const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
+
+      this.x = cx + rx * Math.cos(this.angle);
+      this.y = cy + ry * Math.sin(this.angle * 2);
+
+      this.angle += speed;
+      this.angle = this.angle % (2 * Math.PI);
+
+      this.status = 'stable';
+    } else if (redParticles.length < redParticleLimit && this.status === 'stable') {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const rx = 450;
+      const ry = 150;
+      const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
+
+      this.x = cx + rx * Math.cos(this.angle);
+      this.y = cy + ry * Math.sin(this.angle * 2);
+
+      this.angle += speed;
+      this.angle = this.angle % (2 * Math.PI);
+
+      this.status = 'stable';
+    }
   }
 
   if (this.color === 'rgb(139,0,0)') {
@@ -62,19 +97,6 @@ update() {
 }
 
   moveInCircle() {
-    if (redParticles.length < 5){
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const rx = 450;
-      const ry = 150;
-      const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
-
-      this.x = cx + rx * Math.cos(this.angle);
-      this.y = cy + ry * Math.sin(this.angle * 2);
-
-      this.angle += speed;
-      this.angle = this.angle % (2 * Math.PI);
-  } else {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
       const radius = 200;
@@ -82,8 +104,7 @@ update() {
 
       this.x = cx + radius * Math.cos(this.angle);
       this.y = cy + radius * Math.sin(this.angle);
-      this.angle += speed;      
-    }
+      this.angle += speed;
   }
 
   draw() {
@@ -99,7 +120,7 @@ let redParticles = [];
 const particleLimit = 200;
 const redParticleLimit = 20;
 const sizeAnimationDuration = 3;
-// let isEnlarging = false;
+let isEnlarging = false;
 
 function createParticles() {
   const particleCount = 100;
