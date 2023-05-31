@@ -4,7 +4,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 class Particle {
-  constructor(x, y, size, color, speedX, speedY, hue, saturation) {
+  constructor(x, y, size, color, speedX, speedY, hue, saturation, shape, lifespan) {
     this.x = x;
     this.y = y;
     this.size = size;
@@ -16,13 +16,16 @@ class Particle {
     this.angle = Math.random() * (2 * Math.PI);
     this.hue = hue;
     this.saturation = saturation;
+    this.shape = shape;
+    this.lifespan = lifespan;
+    this.elapsedTime = 0;
   }
 
   update() {
-    const cx = canvas.width / 2; 
-    const cy = canvas.height / 2; 
-    const rx = 450; 
-    const ry = 150; 
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const rx = 450;
+    const ry = 150;
     const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
 
     this.x = cx + rx * Math.cos(this.angle);
@@ -30,6 +33,11 @@ class Particle {
 
     this.angle += speed;
     this.angle = this.angle % (2 * Math.PI);
+
+    this.elapsedTime += 16; // Assuming 60 FPS, approximately 16ms per frame
+    if (this.elapsedTime >= this.lifespan * 1000) {
+      this.fadeOut();
+    }
   }
 
   draw() {
@@ -39,47 +47,43 @@ class Particle {
     ctx.fill();
   }
 
-  enlargeSize(targetSize, duration) {
-    const initialSize = this.size;
-    const sizeIncrement = (targetSize - initialSize) / (duration * 60); 
-    const initialLightness = parseInt(this.color.slice(-3, -1));
-    const lightnessDecrement = initialLightness / (duration * 60); 
+  fadeOut() {
+    const initialAlpha = 1;
+    const alphaDecrement = initialAlpha / (this.lifespan * 60);
 
-    let currentSize = initialSize;
-    let currentLightness = initialLightness;
-    let elapsedTime = 0;
+    let currentAlpha = initialAlpha;
 
-    return new Promise((resolve) => {
-      const sizeAnimation = setInterval(() => {
-        currentSize += sizeIncrement;
-        currentLightness -= lightnessDecrement;
-        this.size = currentSize;
-        this.color = this.color.replace(/(\d{1,3})%/, `${currentLightness}%`);
-        elapsedTime += 1000 / 60; 
+    const fadeOutAnimation = setInterval(() => {
+      currentAlpha -= alphaDecrement;
+      this.color = this.color.replace(/([0-9.]+)\)$/, `${currentAlpha})`);
 
-        if (elapsedTime >= duration * 1000) {
-          clearInterval(sizeAnimation);
-          resolve();
+      if (currentAlpha <= 0) {
+        clearInterval(fadeOutAnimation);
+        const index = redParticles.indexOf(this);
+        if (index !== -1) {
+          redParticles.splice(index, 1);
+          if (redParticles.length < redParticleLimit && isEnlarging) {
+            restartParticles();
+          }
         }
-      }, 1000 / 60); 
-    });
+      }
+    }, 1000 / 60);
   }
 }
 
 let particles = [];
 let redParticles = [];
-const particleLimit = 300;
-const redParticleLimit = 10;
-const sizeAnimationDuration = 3; 
+const particleLimit = 200;
+const redParticleLimit = 20;
+const sizeAnimationDuration = 3;
 let isEnlarging = false;
 
 function createParticles() {
   const particleCount = 100;
-  const size = 10;
 
   const speeds = [];
   for (let i = 0; i < particleCount; i++) {
-    const speed = Math.random() * 2 + 0.01; 
+    const speed = Math.random() * 2 + 0.01;
     speeds.push(speed);
   }
 
@@ -89,35 +93,35 @@ function createParticles() {
   for (let i = 0; i < particleCount; i++) {
     const x = Math.random() * canvas.width;
     const y = Math.random() * canvas.height;
-    const speedX = speeds[i] * (2 * (speeds[i] === minSpeed) - 1); 
-    const speedY = speeds[i] * (2 * (speeds[i] === minSpeed) - 1);
-    const hue = 240 - Math.floor(120 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed)); 
-    const saturation = 100; 
-    const lightness = Math.floor(50 - 20 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed)); 
+    const size = Math.random() * 15 + 5;
+    const speedX = speeds[i] * (1 * (speeds[i] === minSpeed) - 0.01);
+    const speedY = speeds[i] * (1 * (speeds[i] === minSpeed) - 0.5);
+    const hue = 240 - Math.floor(120 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed));
+    const saturation = 100;
+    const lightness = Math.floor(50 - 20 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed));
+    const color = `hsla(${hue}, ${saturation}%, ${lightness}%, 1)`;
+    const lifespan = getRandomLifespan();
 
-    const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-
-    particles.push(new Particle(x, y, size, color, speedX, speedY));
+    particles.push(new Particle(x, y, size, color, speedX, speedY, hue, saturation, 'circle', lifespan));
   }
 }
 
-
+function getRandomLifespan() {
+  return Math.random() * 15 + 15; // Random lifespan between 15 and 30 seconds
+}
 
 function createRedParticle(x, y) {
-  const size = 10;
+  const size = Math.random() * 20 + 10;
   const color = 'rgb(139,0,0)';
-  const speedX = Math.random() * 2 - 1;
-  const speedY = Math.random() * 2 - 1;
+  const speedX = Math.random() * 1 - 0.01;
+  const speedY = Math.random() * 1 - 0.01;
+  const lifespan = getRandomLifespan();
 
-  redParticles.push(new Particle(x, y, size, color, speedX, speedY));
+  redParticles.push(new Particle(x, y, size, color, speedX, speedY, null, null, 'circle', lifespan));
 
-  if (redParticles.length === redParticleLimit) {
-    if (!isEnlarging) {
-      isEnlarging = true;
-      enlargeParticlesSize();
-    } else {
-      restartParticles();
-    }
+  if (redParticles.length >= redParticleLimit && !isEnlarging) {
+    isEnlarging = true;
+    enlargeParticlesSize();
   }
 }
 
@@ -130,6 +134,7 @@ function checkCollision(particle) {
 
     if (distance <= particle.size + redParticle.size) {
       redParticle.color = 'rgb(139,0,0)';
+      particle.color = 'rgb(139,0,0)';
     }
   }
 }
@@ -142,7 +147,7 @@ async function enlargeParticlesSize() {
 }
 
 function restartParticles() {
-  particles = [];
+  particles = particles.filter(particle => particle.color !== 'rgb(139,0,0)');
   redParticles = [];
   isEnlarging = false;
   createParticles();
