@@ -18,23 +18,51 @@ class Particle {
     this.saturation = saturation;
     this.elapsedTime = 0;
     this.targetColor = color;
+    this.colorTimer = 0; 
+    this.lifeTime = 0;
   }
 
-  moveInCircle() {
+update() {
+  if (redParticles.length >= redParticleLimit) {
+    this.moveInCircle();
+  } else {
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
-    const radius = 200;
-    const speed = 0.01;
+    const rx = 450;
+    const ry = 150;
+    const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
 
-    this.x = cx + radius * Math.cos(this.angle);
-    this.y = cy + radius * Math.sin(this.angle);
+    this.x = cx + rx * Math.cos(this.angle);
+    this.y = cy + ry * Math.sin(this.angle * 2);
+
     this.angle += speed;
+    this.angle = this.angle % (2 * Math.PI);
   }
 
-  update() {
-    if (redParticles.length >= redParticleLimit) {
-      this.moveInCircle();
-    } else {
+  if (this.color === 'rgb(139,0,0)') {
+    this.elapsedTime += 1 / 60;
+
+    if (this.elapsedTime >= 5) {
+      const hue = this.hue;
+      const saturation = this.saturation;
+      const lightness = this.lightness;
+      this.targetColor = `hsla(${hue}, ${saturation}%, ${lightness}%, 1)`;
+      this.colorTimer += 1 / 60;
+
+      if (this.colorTimer >= 5) {
+        this.color = this.targetColor;
+
+        if (this.lifeTime >= 3) {
+          const redIndex = redParticles.indexOf(this);
+          redParticles.splice(redIndex, 1);
+        }
+      }
+    }
+  }
+}
+
+  moveInCircle() {
+    if (redParticles.length < 5){
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
       const rx = 450;
@@ -46,14 +74,15 @@ class Particle {
 
       this.angle += speed;
       this.angle = this.angle % (2 * Math.PI);
-    }
+  } else {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const radius = 200;
+      const speed = 0.01;
 
-    if (this.color === 'rgb(139,0,0)') {
-      this.elapsedTime += 1 / 60; 
-
-      if (this.elapsedTime >= 5) {
-        this.color = this.targetColor; 
-      }
+      this.x = cx + radius * Math.cos(this.angle);
+      this.y = cy + radius * Math.sin(this.angle);
+      this.angle += speed;      
     }
   }
 
@@ -70,7 +99,7 @@ let redParticles = [];
 const particleLimit = 200;
 const redParticleLimit = 20;
 const sizeAnimationDuration = 3;
-let isEnlarging = false;
+// let isEnlarging = false;
 
 function createParticles() {
   const particleCount = 100;
@@ -120,26 +149,26 @@ function checkCollision(particle) {
     const dy = particle.y - redParticle.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance <= particle.size + redParticle.size) {
+    if (distance <= particle.size + redParticle.size && redParticle.size > 15) {
       redParticle.color = 'rgb(139,0,0)';
       particle.color = 'rgb(139,0,0)';
     }
   }
 }
 
-async function enlargeParticlesSize() {
-  const allParticles = [...particles, ...redParticles];
-  await Promise.all(allParticles.map(particle => particle.enlargeSize(700, sizeAnimationDuration)));
+// async function enlargeParticlesSize() {
+//   const allParticles = [...particles, ...redParticles];
+//   await Promise.all(allParticles.map(particle => particle.enlargeSize(700, sizeAnimationDuration)));
 
-  restartParticles();
-}
+//   restartParticles();
+// }
 
-function restartParticles() {
-  particles = particles.filter(particle => particle.color !== 'rgb(139,0,0)');
-  redParticles = [];
-  isEnlarging = false;
-  createParticles();
-}
+// function restartParticles() {
+//   particles = particles.filter(particle => particle.color !== 'rgb(139,0,0)');
+//   redParticles = [];
+//   isEnlarging = false;
+//   createParticles();
+// }
 
 function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
