@@ -17,20 +17,44 @@ class Particle {
     this.hue = hue;
     this.saturation = saturation;
     this.elapsedTime = 0;
+    this.targetColor = color;
+  }
+
+  moveInCircle() {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const radius = 200;
+    const speed = 0.01;
+
+    this.x = cx + radius * Math.cos(this.angle);
+    this.y = cy + radius * Math.sin(this.angle);
+    this.angle += speed;
   }
 
   update() {
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const rx = 450;
-    const ry = 150;
-    const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
+    if (redParticles.length >= redParticleLimit) {
+      this.moveInCircle();
+    } else {
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const rx = 450;
+      const ry = 150;
+      const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
 
-    this.x = cx + rx * Math.cos(this.angle);
-    this.y = cy + ry * Math.sin(this.angle * 2);
+      this.x = cx + rx * Math.cos(this.angle);
+      this.y = cy + ry * Math.sin(this.angle * 2);
 
-    this.angle += speed;
-    this.angle = this.angle % (2 * Math.PI);
+      this.angle += speed;
+      this.angle = this.angle % (2 * Math.PI);
+    }
+
+    if (this.color === 'rgb(139,0,0)') {
+      this.elapsedTime += 1 / 60; 
+
+      if (this.elapsedTime >= 5) {
+        this.color = this.targetColor; 
+      }
+    }
   }
 
   draw() {
@@ -76,11 +100,11 @@ function createParticles() {
 }
 
 function createRedParticle(x, y) {
-  const size = Math.random() * 2 + 10;
+  const size = Math.random() * 20 + 10;
   const color = 'rgb(139,0,0)';
   const speedX = Math.random() * 1 - 0.01;
   const speedY = Math.random() * 1 - 0.01;
-
+  
   redParticles.push(new Particle(x, y, size, color, speedX, speedY, null, null));
 
   if (redParticles.length >= redParticleLimit && !isEnlarging) {
@@ -96,7 +120,7 @@ function checkCollision(particle) {
     const dy = particle.y - redParticle.y;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    if (distance <= particle.size + redParticle.size && redParticle.size > 20) {
+    if (distance <= particle.size + redParticle.size) {
       redParticle.color = 'rgb(139,0,0)';
       particle.color = 'rgb(139,0,0)';
     }
