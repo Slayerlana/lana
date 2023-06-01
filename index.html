@@ -6,7 +6,25 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<canvas id="canvas"  ></canvas>
-<script  src="script.js"></script>
+  
+<div id="container">
+  <div id="output"></div>
+  <div class="title">标题</div>
+  <div class="parent">
+    <div class="content">内容</div>
+    <canvas id="canvas"></canvas>
+  </div>
+</div>
+<script  src="jquery.min.js"></script>
+
+<script  src="script1.js"></script>
+<script  src="vector.js"></script>
+<script>
+  $(function(){
+    // 初始化 传入dom id
+    var victor = new Victor("container", "output");
+    victor(["#18bbff", "#00486b"]).set();
+  });
+</script>
 </body>
 </html>
