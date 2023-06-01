@@ -21,11 +21,33 @@ class Particle {
     this.angle = Math.random() * (2 * Math.PI);
     this.hue = hue;
     this.saturation = saturation;
+    this.lightness = this.lightness;
     this.elapsedTime = 0;
-    this.targetColor = color;
     this.colorTimer = 0; 
     this.lifeTime = 0;
+    this.targetColor = color;
     this.status = 'stable';
+    this.isFormingCircle = false;
+    this.isCollpased = isCollpased;
+    this.transitionProgress = 0;
+  }
+
+  smoothChangeColor() {
+    if (this.isCollpased) return;
+
+    let min = 20;
+    const max = 38;
+    setInterval(() => {
+      if (min >= max) {
+        return;
+      };
+
+      min += 2;
+      this.hue = 0;
+      this.saturation = 100;
+      this.lightness = min;
+    }, 500)
+    this.isCollpased = true;
   }
 
 update() {
