@@ -8,6 +8,7 @@ let redParticles = [];
 const particleLimit = 200;
 const redParticleLimit = 20;
 const sizeAnimationDuration = 3;
+const redParticleLifetime = Math.random() * 2 + 5;
 // let isEnlarging = false;
 
 class Particle {
@@ -171,8 +172,17 @@ update() {
   draw() {
     ctx.beginPath();
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-    ctx.fillStyle = this.color;
+    ctx.fillStyle = `hsla(${this.hue}, ${this.saturation}%, ${this.lightness}%, ${this.transparency})`;
     ctx.fill();
+  }
+}
+
+if (this.colorTimer >= 5) {
+  this.color = this.targetColor;
+
+  if (this.lifeTime >= redParticleLifetime) {
+    const redIndex = redParticles.indexOf(this);
+    redParticles.splice(redIndex, 1);
   }
 }
 
@@ -199,7 +209,33 @@ function createParticles() {
     const lightness = Math.floor(50 - 20 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed));
     const color = `hsla(${hue}, ${saturation}%, ${lightness}%, 1)`;
 
-    particles.push(new Particle(x, y, size, color, speedX, speedY, hue, saturation));
+    particles.push(new Particle(x, y, size, speedX, speedY, hue, saturation, lightness));
+  }
+}
+
+function createLightParticles() {
+  const particleCount = Math.floor(Math.random() * 4) + 1;
+
+  const speeds = [];
+  for (let i = 0; i < particleCount; i++) {
+    const speed = Math.random() * 2 + 0.01;
+    speeds.push(speed);
+  }
+
+  const minSpeed = Math.min(...speeds);
+  const maxSpeed = Math.max(...speeds);
+
+  for (let i = 0; i < particleCount; i++) {
+    const x = Math.random() * canvas.width;
+    const y = Math.random() * canvas.height;
+    const size = Math.random() * 15 + 5;
+    const speedX = speeds[i] * (1 * (speeds[i] === minSpeed) - 0.01);
+    const speedY = speeds[i] * (1 * (speeds[i] === minSpeed) - 0.5);
+    const hue = 240 - Math.floor(120 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed));
+    const saturation = 100;
+    const lightness = Math.floor(50 - 20 * (speeds[i] - minSpeed) / (maxSpeed - minSpeed));
+
+    particles.push(new Particle(x, y, size, speedX, speedY, hue, saturation, lightness));
   }
 }
 
