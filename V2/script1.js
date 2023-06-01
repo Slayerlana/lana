@@ -198,6 +198,7 @@ canvas.addEventListener('click', (event) => {
   const y = event.clientY;
 
   createRedParticle(x, y);
+  clickSound();
 });
 
 createParticles();
