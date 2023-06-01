@@ -11,24 +11,32 @@ const sizeAnimationDuration = 3;
 // let isEnlarging = false;
 
 class Particle {
-  constructor(x, y, size, color, speedX, speedY, hue, saturation) {
+  constructor(x, y, size, color, speedX, speedY, hue, saturation, lightness, isCollpased = false) {
     this.x = x;
     this.y = y;
     this.size = size;
-    this.color = color;
     this.speedX = speedX;
     this.speedY = speedY;
+    this.originalSpeedX = speedX;
+    this.originalSpeedY = speedY;
     this.angle = Math.random() * (2 * Math.PI);
     this.hue = hue;
     this.saturation = saturation;
-    this.lightness = this.lightness;
     this.elapsedTime = 0;
-    this.colorTimer = 0; 
+    this.colorTimer = 0;
     this.lifeTime = 0;
-    this.targetColor = color;
-    this.status = 'stable';
     this.isFormingCircle = false;
+    this.circleRadius = 200;
+    this.circleSpeed = 0.01;
+    this.circleAngle = 0;
+    this.lightness = lightness;
+
+    this.originHue = hue;
+    this.originSaturation = saturation;
+    this.originLightness = lightness;
+
     this.isCollpased = isCollpased;
+    this.transparency = 0;
     this.transitionProgress = 0;
   }
 
@@ -51,6 +59,21 @@ class Particle {
   }
 
 update() {
+  if (this.transparency < 1) {
+    this.transparency += 0.01;
+  }
+
+  if (startMovingCircle) {
+    if (this.transitionProgress < 1) {
+      this.transitionProgress += 0.01;
+    }
+    this.moveInInfinityWithTransition();
+    this.currentTrack = "circle";
+  } else {
+    this.moveInEight();
+    this.currentTrack = "infinity"
+  } 
+
   if (redParticles.length >= redParticleLimit) {
     this.moveInCircle();
   } else {
@@ -102,6 +125,36 @@ update() {
 
     this.angle += speed;
     this.angle = this.angle % (2 * Math.PI);
+  }
+
+  moveInInfinityWithTransition() {
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const rx = 450;
+    const ry = 150;
+    const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.002;
+  
+    const transitionOffset = Math.PI / 2;
+  
+    if (this.transitionProgress < 0.5) {
+      // Fade out moveInfinity
+      const transitionFactor = this.transitionProgress * 2;
+      this.angle += speed;
+      this.angle = this.angle % (2 * Math.PI);
+      const fadeOutAngle = this.angle + transitionFactor * Math.PI + transitionOffset;
+      this.x = cx + rx * Math.cos(fadeOutAngle);
+      this.y = cy + ry * Math.sin(fadeOutAngle * 2);
+    } else {
+      // Fade in moveInCircle
+      const transitionFactor = (this.transitionProgress - 0.5) * 2;
+      const fadeInAngle = this.angle + Math.PI + transitionFactor * Math.PI + transitionOffset;
+      const radius = 200;
+      const speed = 0.01;
+  
+      this.x = cx + radius * Math.cos(fadeInAngle);
+      this.y = cy + radius * Math.sin(fadeInAngle);
+      this.angle += speed;
+    }
   }
 
   moveInCircle() {
