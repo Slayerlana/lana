@@ -3,6 +3,13 @@ const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+let particles = [];
+let redParticles = [];
+const particleLimit = 200;
+const redParticleLimit = 20;
+const sizeAnimationDuration = 3;
+// let isEnlarging = false;
+
 class Particle {
   constructor(x, y, size, color, speedX, speedY, hue, saturation) {
     this.x = x;
@@ -11,8 +18,6 @@ class Particle {
     this.color = color;
     this.speedX = speedX;
     this.speedY = speedY;
-    this.originalSpeedX = speedX;
-    this.originalSpeedY = speedY;
     this.angle = Math.random() * (2 * Math.PI);
     this.hue = hue;
     this.saturation = saturation;
@@ -27,49 +32,16 @@ update() {
   if (redParticles.length >= redParticleLimit) {
     this.moveInCircle();
   } else {
-    const cx = canvas.width / 2;
-    const cy = canvas.height / 2;
-    const rx = 450;
-    const ry = 150;
-    const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
-
-    this.x = cx + rx * Math.cos(this.angle);
-    this.y = cy + ry * Math.sin(this.angle * 2);
-
-    this.angle += speed;
-    this.angle = this.angle % (2 * Math.PI);
-
+    this.moveInInfinity();
 
     if (redParticles.length >= redParticleLimit && this.status === 'stable') {
       this.moveInCircle();
       this.status = 'unstable';
     } else if (this.status === 'unstable' && redParticles.length < 5) {
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const rx = 450;
-      const ry = 150;
-      const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
-
-      this.x = cx + rx * Math.cos(this.angle);
-      this.y = cy + ry * Math.sin(this.angle * 2);
-
-      this.angle += speed;
-      this.angle = this.angle % (2 * Math.PI);
-
+      this.moveInInfinity();
       this.status = 'stable';
     } else if (redParticles.length < redParticleLimit && this.status === 'stable') {
-      const cx = canvas.width / 2;
-      const cy = canvas.height / 2;
-      const rx = 450;
-      const ry = 150;
-      const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
-
-      this.x = cx + rx * Math.cos(this.angle);
-      this.y = cy + ry * Math.sin(this.angle * 2);
-
-      this.angle += speed;
-      this.angle = this.angle % (2 * Math.PI);
-
+      this.moveInInfinity();
       this.status = 'stable';
     }
   }
@@ -96,6 +68,20 @@ update() {
   }
 }
 
+  moveInInfinity(){
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const rx = 450;
+    const ry = 150;
+    const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.001;
+
+    this.x = cx + rx * Math.cos(this.angle);
+    this.y = cy + ry * Math.sin(this.angle * 2);
+
+    this.angle += speed;
+    this.angle = this.angle % (2 * Math.PI);
+  }
+
   moveInCircle() {
       const cx = canvas.width / 2;
       const cy = canvas.height / 2;
@@ -114,13 +100,6 @@ update() {
     ctx.fill();
   }
 }
-
-let particles = [];
-let redParticles = [];
-const particleLimit = 200;
-const redParticleLimit = 20;
-const sizeAnimationDuration = 3;
-let isEnlarging = false;
 
 function createParticles() {
   const particleCount = 100;
@@ -154,13 +133,13 @@ function createRedParticle(x, y) {
   const color = 'rgb(139,0,0)';
   const speedX = Math.random() * 1 - 0.01;
   const speedY = Math.random() * 1 - 0.01;
-  
+
   redParticles.push(new Particle(x, y, size, color, speedX, speedY, null, null));
 
-  if (redParticles.length >= redParticleLimit && !isEnlarging) {
-    isEnlarging = true;
-    enlargeParticlesSize();
-  }
+  // if (redParticles.length >= redParticleLimit && !isEnlarging) {
+  //   isEnlarging = true;
+  //   enlargeParticlesSize();
+  // }
 }
 
 function checkCollision(particle) {
