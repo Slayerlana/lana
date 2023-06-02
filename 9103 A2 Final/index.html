@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" >
+  <head>
+    <meta charset="UTF-8">
+    <title>Assignment - Carbon cycle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="stylesheet" href="./styles/button.css">
+    <link rel="stylesheet" href="./styles/description.css">
+    <link rel="stylesheet" href="./styles/title.css">
+   <link rel="stylesheet" href="./styles/mouse.css">
+
+  </head>
+   <body>
+    <canvas id="canvas2"></canvas>
+    <h1 class="title">Carbon cycle</h1>
+    <h2 class="ds-container" >
+Against the backdrop of ongoing global warming, this design aims to raise people's awareness about the importance of living a low-carbon lifestyle and contribute to combat climate change. This is done by visually depicting the consequences of human actions on the environment and the potential for positive change
+The design takes the form of a simulation of the carbon cycle, employing visual elements to represent molecules in the air. Blue and green particles symbolise general atmospheric molecules, while red particles symbolise carbon dioxide (CO2). 
+Starting with a stable and balanced status where particles move in infinity shape. By clicking on the screen, users release red particles, representing different human activities that contribute to CO2 emissions, such as burning fossil fuels and deforestation. As the number of clicks increases, the number of red particles also increases, simulating the progressive release of CO2 emissions.
+Once the CO2 reaches a specific threshold, the particles start to move in circular paths, signifying an unstable environment. Users then need to add green and blue particles back into the path until it is covered up the path. Hence, returning back to the original path and emphasising the importance of engaging in CO2 reduction actions.
+    </h2>
+
+    <div class="flow-middle">
+      <button id="start">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span> Play
+      </button>
+    </div>
+    <canvas id="canvas"></canvas>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script  src="./scripts/staging.js"></script>
+    <script  src="./scripts/script.js"></script>
+    <script  src="./scripts/tone.js"></script>
+    <script  src="./scripts/mouse.js"></script>
+    <audio id="background-music">
+      <source src="./Room.mp3" type="audio/mpeg">
+    </audio>
+    
+  </body>
+</html>
