@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" >
+  <head>
+    <meta charset="UTF-8">
+    <title>Assignment - Carbon cycle</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="./styles/style.css">
+    <link rel="stylesheet" href="./styles/button.css">
+    <link rel="stylesheet" href="./styles/description.css">
+    <link rel="stylesheet" href="./styles/title.css">
+   <link rel="stylesheet" href="./styles/mouse.css">
+
+ 
+
+  </head>
+   <body>
+    <canvas id="canvas2"></canvas>
+    <h1 class="title">Carbon cycle</h1>
+    <h2 class="ds-container" >
+      Against the backdrop of ongoing global warming, this 
+      design aims to raise awareness among people
+      about the importance of living a low-carbon lifestyle 
+      and encourages them to adopt environmentally-friendly practices. 
+
+      The design takes the form of a simulation of the carbon cycle, 
+      where users can click on the screen to release red particles 
+      representing the emission of carbon dioxide. As the number of 
+      clicks increases, the quantity of red particles also increases, 
+      simulating the process of carbon emissions. When the carbon dioxide 
+      reaches a certain threshold, the particles begin 
+      to move in circular trajectories, indicating that people are becoming 
+      aware of the need to reduce carbon emissions. 
+
+      As people start reducing their carbon emissions, the particles gradually 
+      transition back to green.</h2>
+
+    <div class="flow-middle">
+      <button id="start">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span> Play
+      </button>
+    </div>
+    <canvas id="canvas"></canvas>
+   
+   
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script  src="./scripts/staging.js"></script>
+    <script  src="./scripts/script1.js"></script>
+    <script  src="./scripts/title.js"></script>
+    <script  src="./scripts/tone.js"></script>
+    <script  src="./scripts/mouse.js"></script>
+    <audio id="background-music">
+      <source src="./Room.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+    
+  </body>
+</html>
