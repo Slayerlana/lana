@@ -20,9 +20,6 @@ class Particle {
     this.originalSpeedX = speedX;
     this.originalSpeedY = speedY;
     this.angle = Math.random() * (2 * Math.PI);
-    this.transitionProgress = 0; // Initialize transition progress
-    this.transitionDirection = 1; // Initialize transition direction
-
     this.hue = hue;
     this.saturation = saturation;
     this.elapsedTime = 0;
@@ -41,33 +38,32 @@ class Particle {
     this.isCollpased = isCollpased;
 
     this.transitionProgress = 0;
+    this.transitionDirection = 1; // Initialize transition direction
     this.transitionProgress += 0.001 * this.transitionDirection;
- 
-  
   }
-  lerp(start, end, t) {
-    return start * (1 - t) + end * t;
-  }
-
 
   smoothChangeColor() {
     if (this.isCollpased) return;
-
+  
     let min = 20;
     const max = 38;
-    setInterval(() => {
-      if (min >= max) {
-        return;
-      };
-
+  
+    const updateColor = () => {
+      if (min >= max) return;
+  
       min += 2;
       this.hue = 0;
       this.saturation = 100;
       this.lightness = min;
-    }, 500)
+  
+      setTimeout(updateColor, 500);
+    };
+  
+    updateColor();
+  
     this.isCollpased = true;
   }
-
+  
   update() {
     if (this.transparency < 1) {
       this.transparency += 0.01;
@@ -76,19 +72,22 @@ class Particle {
     if (startMovingCircle) {
       if (this.transitionProgress < 1) {
         this.transitionProgress += 0.01;
-        this.moveInEightWithTransition();
-      } else {
-        this.moveInCircle();
       }
+      this.moveInEightWithTransition();
       this.currentTrack = "circle";
     } else {
       this.moveInEight();
-      this.currentTrack = "eight";
-    }
-
+      this.currentTrack = "eight"
+    } 
     
     if (this.isCollpased) {
       this.elapsedTime += 1 / 60;
+      this.lifeTime += 1 / 60;
+    
+      if (this.lifeTime >= redParticleLifetime) {
+        const redIndex = particles.indexOf(this);
+        particles.splice(redIndex, 1);
+      }
 
       if (this.elapsedTime >= 100) {
         const hue = this.hue;
@@ -102,13 +101,7 @@ class Particle {
         this.lightness = this.originLightness;
 
         if (this.colorTimer >= 5) {
-          if (this.lifeTime >= 3) {
-            this.isCollpased = false;
-            this.hue = this.originHue;
-            this.saturation = this.originSaturation;
-            this.lightness = this.originLightness;
-            console.log('fixOne', redParticles.length)
-          }
+          this.color = this.targetColor;
         }
       }
     }
@@ -128,40 +121,36 @@ class Particle {
     this.angle = this.angle % (2 * Math.PI);
   }
 
-
   moveInEightWithTransition() {
     const cx = canvas.width / 2;
     const cy = canvas.height / 2;
     const rx = 450;
     const ry = 150;
     const speed = 0.001 + Math.sqrt(this.speedX ** 2 + this.speedY ** 2) * 0.002;
+  
+    const transitionOffset = Math.PI / 2;
+  
+    if (this.transitionProgress < 0.5) {
+      // Fade out moveInEight
+      const transitionFactor = this.transitionProgress * 2;
+      this.angle += speed;
+      this.angle = this.angle % (2 * Math.PI);
+      const fadeOutAngle = this.angle + transitionFactor * Math.PI + transitionOffset;
+      this.x = cx + rx * Math.cos(fadeOutAngle);
+      this.y = cy + ry * Math.sin(fadeOutAngle * 2);
+    } else {
+      // Fade in moveInCircle
+      const transitionFactor = (this.transitionProgress - 0.5) * 2;
+      const fadeInAngle = this.angle + Math.PI + transitionFactor * Math.PI + transitionOffset;
+      const radius = 200;
+      const speed = 0.01;
+  
+      this.x = cx + radius * Math.cos(fadeInAngle);
+      this.y = cy + radius * Math.sin(fadeInAngle);
+      this.angle += speed;
 
-    const eightX = cx + rx * Math.cos(this.angle);
-    const eightY = cy + ry * Math.sin(this.angle * 2);
- 
-    // Calculate position in circle track
-    const circleRadius = 200;
-    const circleX = cx + circleRadius * Math.cos(this.angle);
-    const circleY = cy + circleRadius * Math.sin(this.angle);
- 
-    // Interpolate between the two positions
-    this.x = this.lerp(eightX, circleX, this.transitionProgress);
-    this.y = this.lerp(eightY, circleY, this.transitionProgress);
- 
-    this.angle += speed;
-    this.angle = this.angle % (2 * Math.PI);
-
-      // Reverse transition direction when progress reaches 0 or 1
-      if (this.transitionProgress <= 0 || this.transitionProgress >= 1) {
-        this.transitionDirection *= -1;
-      }
-
-    
+    }
   }
-
-     
-
-
 
   moveInCircle() {
     const cx = canvas.width / 2;
@@ -186,9 +175,19 @@ class Particle {
 let particles = [];
 let currentTrack = "eight";
 const particleLimit = 300;
-const redParticles = [];
-const redParticleLimit = 50;
+let redParticles = [];
+const redParticleLimit = 15;
 const sizeAnimationDuration = 3;
+const redParticleLifetime = Math.random() * 2 + 5;
+
+if (this.colorTimer >= 5) {
+        this.color = this.targetColor;
+
+        if (this.lifeTime >= redParticleLifetime) {
+          const redIndex = redParticles.indexOf(this);
+          redParticles.splice(redIndex, 1);
+        }
+      }
 
 const filterRedParticles = () => {
   return particles.filter((p) => p.isCollpased);
@@ -253,7 +252,7 @@ function createRedParticle(x, y) {
 
   const newParticle = new Particle(x, y, size, speedX, speedY, 0, 100, 38, true);
   particles.push(newParticle);
-
+  redParticles.push(newParticle);
 }
 
 function removeRedParticle(particle) {
@@ -300,6 +299,7 @@ canvas.addEventListener('click', (event) => {
   const x = event.clientX;
   const y = event.clientY;
   clickSound();
+
   if(currentTrack == "eight"){
     createRedParticle(x, y);
     redParticles.length += 1;
@@ -322,19 +322,19 @@ canvas.addEventListener('click', (event) => {
 });
 
 
-function slowShowParticles() {
-  const interval = setInterval(() => {
-    if (particles[0].transparency >= 1) {
-      clearInterval(interval);
-      initialize();
-      return;
-    }
+// function slowShowParticles() {
+//   const interval = setInterval(() => {
+//     if (particles[0].transparency >= 1) {
+//       clearInterval(interval);
+//       initialize();
+//       return;
+//     }
 
-    for (let i = 0; i < particles.length; i++) {
-      particles[i].transparency += 0.01;
-    }
-  }, 100);
-}
+//     for (let i = 0; i < particles.length; i++) {
+//       particles[i].transparency += 0.01;
+//     }
+//   }, 100);
+// }
 
 function initialize() {
   // 进行程序的初始化操作
