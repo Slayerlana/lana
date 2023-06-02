@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(#58ae75, #224959);
+}
+
+.flow-middle {
+  position: absolute;
+  top: 40%;
+  left:48%;
+}
+
+.absolute-btn {
+  float:left;
+}
+
+.container {
+    display: grid; 
+    grid-template-columns: 1.5fr 1fr 1fr 1fr; 
+    grid-template-rows: 0.3fr 1fr 1fr 1fr; 
+    gap: 0px 50px; 
+    grid-template-areas: 
+      "grid-header grid-header grid-header grid-header"
+      "grid-text grid-svg grid-svg grid-svg"
+      "grid-text grid-svg grid-svg grid-svg"
+      "grid-text grid-svg grid-svg grid-svg"; 
+  }
+  
+  .grid-header { grid-area: grid-header;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size:x-large;
+    color: rgb(215, 32, 32); 
+    font-family: Calibri;
+    text-align: center;
+
+    text-shadow:     0 1px 0 hsl(174, 5%, 78%),
+	                 0 2px 0 hsl(174,5%,75%),
+	                 0 3px 0 hsl(174,5%,70%),
+	                 0 4px 0 hsl(174,5%,66%),
+	                 0 5px 0 hsl(174,5%,64%),
+	                 0 6px 0 hsl(174,5%,62%),
+	                 0 7px 0 hsl(174,5%,61%),
+	                 0 8px 0 hsl(174,5%,60%),
+	
+	                 0 0 5px rgba(0,0,0,.05),
+	                0 1px 3px rgba(0,0,0,.2),
+	                0 3px 5px rgba(0,0,0,.2),
+	               0 5px 10px rgba(0,0,0,.2),
+	              0 10px 10px rgba(0,0,0,.2),
+	              0 20px 20px rgba(0,0,0,.3);    
+}
+  
+  .grid-text { grid-area: grid-text; 
+    /* background-color: rgb(64, 89, 136); */
+    color: hsl(208, 24%, 11%);
+    font-size: small;
+    font-family: 'Gochi Hand', cursive;
+    padding: 30px;
+    line-height: 1.5
+}
+  
+  .grid-svg { grid-area: grid-svg;
+}
+  
