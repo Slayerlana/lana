@@ -18,12 +18,12 @@ body {
     display: grid; 
     grid-template-columns: 1.5fr 1fr 1fr 1fr; 
     grid-template-rows: 0.3fr 1fr 1fr 1fr; 
-    gap: 0px 50px; 
+    gap: 0px 30px; 
     grid-template-areas: 
       "grid-header grid-header grid-header grid-header"
-      "grid-text grid-svg grid-svg grid-svg"
-      "grid-text grid-svg grid-svg grid-svg"
-      "grid-text grid-svg grid-svg grid-svg"; 
+      "grid-text grid-canvas grid-canvas grid-canvas"
+      "grid-text grid-canvas grid-canvas grid-canvas"
+      "grid-text grid-canvas grid-canvas grid-canvas"; 
   }
   
   .grid-header { grid-area: grid-header;
@@ -51,7 +51,6 @@ body {
 }
   
   .grid-text { grid-area: grid-text; 
-    /* background-color: rgb(64, 89, 136); */
     color: hsl(208, 24%, 11%);
     font-size: small;
     font-family: 'Gochi Hand', cursive;
@@ -59,6 +58,6 @@ body {
     line-height: 1.5
 }
   
-  .grid-svg { grid-area: grid-svg;
+  .grid-canvas { grid-area: grid-canvas;
 }
   
