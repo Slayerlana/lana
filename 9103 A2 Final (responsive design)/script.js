@@ -11,7 +11,7 @@ let particles = []; // store Particle objects
 let currentTrack = "eight";
 const particleLimit = 300; 
 const redParticles = []; // store red Particle objects
-const redParticleLimit = 50;
+const redParticleLimit = 30;
 
 class Particle {
   constructor(x, y, size, speedX, speedY, hue, saturation, lightness, isCollpased = false) {
