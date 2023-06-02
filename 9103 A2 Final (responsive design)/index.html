@@ -7,8 +7,9 @@
     <title>Assignment - Carbon cycle</title>
     <link rel="stylesheet" href="style.css"/>
     <link rel="stylesheet" href="button.css"/>
+    <link rel="stylesheet" href="mouse.css"/>
   </head>
-   <body>
+  <body>
     <div class="container">
       <div class="grid-header">
         <h1> Carbon cycle</h1></div>
@@ -16,9 +17,9 @@
         <h4>About Our Work</h4>
         <p>      
           Against the backdrop of ongoing global warming, this design aims to raise people's awareness about the importance of living a low-carbon lifestyle and contribute to combat climate change. This is done by visually depicting the consequences of human actions on the environment and the potential for positive change
-The design takes the form of a simulation of the carbon cycle, employing visual elements to represent molecules in the air. Blue and green particles symbolise general atmospheric molecules, while red particles symbolise carbon dioxide (CO2). 
-Starting with a stable and balanced status where particles move in infinity shape. By clicking on the screen, users release red particles, representing different human activities that contribute to CO2 emissions, such as burning fossil fuels and deforestation. As the number of clicks increases, the number of red particles also increases, simulating the progressive release of CO2 emissions.
-Once the CO2 reaches a specific threshold, the particles start to move in circular paths, signifying an unstable environment. Users then need to add green and blue particles back into the path until it is covered up the path. Hence, returning back to the original path and emphasising the importance of engaging in CO2 reduction actions.</p>
+          The design takes the form of a simulation of the carbon cycle, employing visual elements to represent molecules in the air. Blue and green particles symbolise general atmospheric molecules, while red particles symbolise carbon dioxide (CO2). 
+          Starting with a stable and balanced status where particles move in infinity shape. By clicking on the screen, users release red particles, representing different human activities that contribute to CO2 emissions, such as burning fossil fuels and deforestation. As the number of clicks increases, the number of red particles also increases, simulating the progressive release of CO2 emissions.
+          Once the CO2 reaches a specific threshold, the particles start to move in circular paths, signifying an unstable environment. Users then need to add green and blue particles back into the path until it is covered up the path. Hence, returning back to the original path and emphasising the importance of engaging in CO2 reduction actions.</p>
       </div>
       <div class="flow-middle">
         <button id="start">
@@ -31,8 +32,10 @@ Once the CO2 reaches a specific threshold, the particles start to move in circul
     <div class="grid-canvas">
       <canvas id="canvas"></canvas>
     </div>
-    <script src="utils.js"></script>
     <script src="script.js"></script>
+    <script src="mouse.js"></script>
+    <script src="staging.js"></script>
+    <script src="tone.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <audio id="background-music">
       <source src="./Room.mp3" type="audio/mpeg">
